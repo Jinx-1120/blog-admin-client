@@ -1,3 +1,4 @@
+ /* eslint-disable */
 import Vue from 'vue'
 import Router from 'vue-router'
 
@@ -5,14 +6,13 @@ Vue.use(Router)
 const router = new Router({
   routes: [{
       path: '/login',
+      component: () => import('@/pages/login.vue'),
       name: 'Login',
-      component: () =>
-        import ('../pages/login.vue')
     },
     {
       path: '/404',
       name: '404',
-      component: () => import ('../pages/404.vue')
+      component: () => import('../pages/404.vue')
     },
     {
       path: '/',
