@@ -1,129 +1,131 @@
 <template>
   <div class="tags-view-container">
-    <scroll-pane class='tags-view-wrapper' ref='scrollPane'>
-      <router-link ref='tag' class="tags-view-item" :class="isActive(tag)?'active':''" v-for="tag in visitedViews"
-        :to="tag" :key="tag.path" @contextmenu.prevent.native="openMenu(tag,$event)">
-        {{tag.meta.name}}
-        <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
+    <scroll-pane ref="scrollPane" class="tags-view-wrapper">
+      <router-link
+        v-for="tag in visitedViews"
+        ref="tag"
+        :class="isActive(tag)?'active':''"
+        :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
+        :key="tag.path"
+        tag="span"
+        class="tags-view-item"
+        @click.middle.native="closeSelectedTag(tag)">
+        {{ tag.name }}
+        <span class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
       </router-link>
+      <el-dropdown class="contextmenu">
+        <span class="el-dropdown-link">
+          更多操作<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item >
+            <span @click="closeSelectedTag(selectedTag)">关闭</span>
+          </el-dropdown-item>
+          <el-dropdown-item >
+            <span @click="closeOthersTags">关闭其他</span>
+          </el-dropdown-item>
+          <el-dropdown-item>
+            <span @click="closeAllTags">关闭所有</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </scroll-pane>
-    <ul class='contextmenu' v-show="visible" :style="{left:left+'px',top:top+'px'}">
-      <li @click="closeSelectedTag(selectedTag)">关闭</li>
-      <li @click="closeOthersTags">关闭其他</li>
-      <li @click="closeAllTags">关闭所有</li>
-    </ul>
   </div>
 </template>
 
-<script>
-import ScrollPane from './ScrollPane'
-import { mapState } from 'vuex'
-export default {
-  components: { ScrollPane },
-  data() {
-    return {
-      visible: false,
-      top: 0,
-      left: 0,
-      selectedTag: {}
-    }
-  },
-  computed: {
-    ...mapState({
-      visitedViews: state => state.tagsView.visitedViews
-    })
-  },
-  watch: {
-    $route() {
-      this.addViewTags()
-      this.moveToCurrentTag()
-    },
-    visible(value) {
-      if (value) {
-        document.body.addEventListener('click', this.closeMenu)
-      } else {
-        document.body.removeEventListener('click', this.closeMenu)
-      }
-    }
-  },
-  mounted() {
+<script lang="ts">
+import ScrollPane from '@/components/ScrollPane.vue'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Route } from 'vue-router'
+
+
+@Component({
+  components: {
+    ScrollPane
+  }
+})
+export default class TagView extends Vue {
+  private visible: boolean = false
+  private top: number = 0
+  private left: number = 0
+  private selectedTag: object = {}
+
+  private get visitedViews () {
+    return this.$store.state.tagview.visitedViews
+  }
+
+  @Watch('$route')
+  private routeChange () {
     this.addViewTags()
-  },
-  methods: {
-    generateRoute() {
-      if (this.$route.name) {
-        return this.$route
-      }
-      return false
-    },
-    isActive(route) {
-      return route.name === this.$route.name
-    },
-    addViewTags() {
-      const route = this.generateRoute()
-      if (this.visitedViews.indexOf(route) === -1) {
-        this.$store.dispatch('addVisitedViews', route)
-      } else {
-        return false
-      }
-    },
-    moveToCurrentTag() {
-      const tags = this.$refs.tag
-      this.$nextTick(() => {
-        for (const tag of tags) {
-          if (tag.to.path === this.$route.path) {
-            this.$refs.scrollPane.moveToTarget(tag.$el)
-            break
-          }
-        }
-      })
-    },
-    closeSelectedTag(view) {
-      this.$store.dispatch('delVisitedViews', view).then((views) => {
-        if (this.isActive(view)) {
-          const latestView = views.slice(-1)[0]
-          if (latestView) {
-            this.$router.push(latestView)
-          } else {
-            this.$router.push('/')
-          }
-        }
-      })
-    },
-    closeOthersTags() {
-      this.$router.push(this.selectedTag)
-      this.$store.dispatch('delOthersViews', this.selectedTag).then(() => {
-        this.moveToCurrentTag()
-      })
-    },
-    closeAllTags() {
-      this.$store.dispatch('delAllViews')
-      this.$router.push('/')
-    },
-    openMenu(tag, e) {
-      this.visible = true
-      this.selectedTag = tag
-      const offsetLeft = this.$el.getBoundingClientRect().left // container margin left
-      this.left = e.clientX - offsetLeft + 15 // 15: margin right
-      this.top = e.clientY
-    },
-    closeMenu() {
-      this.visible = false
+    this.moveToCurrentTag()
+  }
+
+  private mounted () {
+    this.addViewTags()
+  }
+
+  private isActive (route: Route) {
+    route.path === this.$route.path ? this.selectedTag = route : this.selectedTag = {}
+    return route.path === this.$route.path
+  }
+  private addViewTags () {
+    const { name } = this.$route
+    if (name) {
+      this.$store.dispatch('addView', this.$route)
     }
+    return false
+  }
+  private moveToCurrentTag () {
+    const tags: any = this.$refs.tag
+    this.$nextTick (() => {
+      for (const tag of tags) {
+        if (tag.to.path === this.$route.path) {
+          if (tag.to.fullPath !== this.$route.fullPath) {
+            this.$store.dispatch('updateVisitedView', this.$route)
+          }
+          break
+        }
+      }
+    })
+  }
+  private closeSelectedTag (view: any) {
+    this.$store.dispatch('delView', view).then(({ visitedViews }) => {
+      if (this.isActive(view)) {
+        const latestView = visitedViews.slice(-1)[0]
+        if (latestView) {
+          this.$router.push(latestView)
+        } else {
+          this.$router.push('/')
+        }
+      }
+    })
+  }
+  private closeOthersTags () {
+    this.$router.push(this.selectedTag)
+    this.$store.dispatch('delOthersViews', this.selectedTag).then(() => {
+      this.moveToCurrentTag()
+    })
+  }
+  private closeAllTags () {
+    this.$store.dispatch('delAllViews')
+    this.$router.push('/')
   }
 }
+
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .tags-view-container {
+  height: 34px;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #d8dce5;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
   .tags-view-wrapper {
-    background: #fff;
-    height: 34px;
-    border-bottom: 1px solid #d8dce5;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
     .tags-view-item {
       display: inline-block;
       position: relative;
+      cursor: pointer;
       height: 26px;
       line-height: 26px;
       border: 1px solid #d8dce5;
@@ -135,6 +137,9 @@ export default {
       margin-top: 4px;
       &:first-of-type {
         margin-left: 15px;
+      }
+      &:last-of-type {
+        margin-right: 15px;
       }
       &.active {
         background-color: #42b983;
@@ -154,47 +159,16 @@ export default {
     }
   }
   .contextmenu {
-    margin: 0;
     background: #fff;
     z-index: 100;
-    position: absolute;
     list-style-type: none;
-    padding: 5px 0;
-    border-radius: 4px;
+    padding: 4px;
+    border-radius: 0px;
+    border: 1px #ccc solid;
     font-size: 12px;
+    cursor: pointer;
     font-weight: 400;
     color: #333;
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
-    li {
-      margin: 0;
-      padding: 7px 16px;
-      cursor: pointer;
-      &:hover {
-        background: #eee;
-      }
-    }
-  }
-}
-.tags-view-wrapper {
-  .tags-view-item {
-    .el-icon-close {
-      width: 16px;
-      height: 16px;
-      vertical-align: 2px;
-      border-radius: 50%;
-      text-align: center;
-      transition: all .3s cubic-bezier(.645, .045, .355, 1);
-      transform-origin: 100% 50%;
-      &:before {
-        transform: scale(.6);
-        display: inline-block;
-        vertical-align: -3px;
-      }
-      &:hover {
-        background-color: #b4bccc;
-        color: #fff;
-      }
-    }
   }
 }
 </style>
