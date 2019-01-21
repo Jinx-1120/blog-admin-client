@@ -23,9 +23,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import NavBar from '@/components/NavBar.vue'
-import LeftMenu from '@/components/LeftMenu.vue'
-import TagView from '@/components/TagView.vue'
+import NavBar from '../components/NavBar.vue'
+import LeftMenu from '../components/leftMenu.vue'
+import TagView from '../components/TagView.vue'
 
 @Component({
   components: {

@@ -35,7 +35,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 @Component
-export default class HelloWorld extends Vue {
+export default class NavBar extends Vue {
   // private sidebar: boolean = false
   private get sidebar (): boolean {
     return this.$store.state.app.sidebar.opend
