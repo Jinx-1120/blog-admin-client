@@ -4,9 +4,8 @@
  * @Description: api file
  */
 
- import * as user from './module/user'
-
- export default {
-   ...user
- }
+import * as api from './api'
+export default {
+  ...api
+}
 
