@@ -5,8 +5,10 @@ import store from './store'
 import * as ElementUi from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/scss/index.scss'
+import { format } from './filter/index'
 
 Vue.use(ElementUi)
+Vue.filter('format', format)
 Vue.config.productionTip = false
 
 const app = new Vue({
