@@ -17,7 +17,7 @@ declare namespace Ajax {
      * 数据
      * @type { any }
      */
-    result: any,
+    data: any,
 
     /**
      * 消息
