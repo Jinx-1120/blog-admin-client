@@ -10,15 +10,16 @@ Vue.use(Router)
 
 const routers: RouteConfig[] = [
   {
-    path: '/',
-    name: '首页',
-    redirect: '/home',
+    path: '/das',
+    redirect: {
+      name: '首页'
+    },
     meta: { leaf: true, icon: 'icon-home', show: true},
     component: () => import(/* webpackChunkName: "index" */ './layout/index.vue'),
     children: [
       {
         path: '/home',
-        component: () => import(/* webpackChunkName: "about" */ './views/Home.vue'),
+        component: () => import(/* webpackChunkName: "about" */ './views/Article.vue'),
         name: '首页',
         meta: { requireAuth: true, leaf: false, show: true }
       },
