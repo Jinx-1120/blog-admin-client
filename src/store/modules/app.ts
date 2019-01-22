@@ -3,10 +3,10 @@
  * @Date: 2019-01-15 11:31:50
  * @Description: app store file
  */
-import Vue from 'vue'
+// import Vue from 'vue'
 import Cookies from 'js-cookie'
-import Vuex, { ActionTree, MutationTree } from 'vuex'
-import httpservice from '../../api'
+import { ActionTree, MutationTree } from 'vuex'
+// import httpservice from '../../api'
 
 interface ISidebar {
   opend: boolean
