@@ -1,7 +1,7 @@
 /*
  * @Author: jhd
  * @Date: 2019-01-21 18:05:40
- * @Description: article store file 
+ * @Description: article store file
  */
 
 import { ActionTree, MutationTree } from 'vuex'

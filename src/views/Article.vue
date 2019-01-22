@@ -130,12 +130,12 @@ export default class Article extends Vue {
     page_size: 20,
     tag: ''
   }
-  private handleSizeChange(val: any) {
+  private handleSizeChange (val: any) {
     console.log(`每页 ${val} 条`)
     this.queryOptions.page_size = val
     this.getData()
   }
-  private handleCurrentChange(val: any) {
+  private handleCurrentChange (val: any) {
     console.log(`当前页: ${val}`)
   }
   private get total (): number {
@@ -167,11 +167,11 @@ export default class Article extends Vue {
     ])
   }
   private mounted (): void {
-    let that = this
-    this.$nextTick( ()=> {
+    const that = this
+    this.$nextTick( () => {
       that.tableHeight = document.documentElement.clientHeight - 200
     })
-    window.onresize = function () {
+    window.onresize = () => {
       that.tableHeight = document.documentElement.clientHeight - 200
     }
   }
