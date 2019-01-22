@@ -10,7 +10,7 @@
     <div class="main-container" >
       <NavBar></NavBar>
       <TagView></TagView>
-      <div class="app-main">
+      <div class="app-main" id="app-main">
         <transition name="fade-transform" mode="out-in">
           <keep-alive >
             <router-view ></router-view>
@@ -59,6 +59,10 @@ export default class Layout extends Vue {
     position: fixed;
     top: 0;
   }
+}
+.app-main {
+  overflow-y: auto;
+  // min-height: calc(100vh - 86px);
 }
 </style>
  
