@@ -5,6 +5,7 @@
  */
 import { ActionTree, MutationTree } from 'vuex'
 import httpservice from '../../api'
+import { error, success } from '../../utils/notification'
 interface ITag {
   author: string
   count: number
@@ -23,6 +24,18 @@ const actions: ActionTree<IState, any> = {
     const res: Ajax.AjaxResponse = await httpservice.getTagList()
     if (res.code === 200) commit('SET_TAG', res.data)
     else commit('SET_TAG', [])
+  },
+  async removeTag ({commit}, tag: any): Promise<Ajax.AjaxResponse> {
+    const res: Ajax.AjaxResponse = await httpservice.removeTag(tag)
+    if (res.code === 200) success('标签删除成功')
+    else error (res.message)
+    return res
+  },
+  async addTag ({commit}, payload: any): Promise<Ajax.AjaxResponse> {
+    const res: Ajax.AjaxResponse = await httpservice.addTag(payload)
+    if (res.code === 200) success('标签删除成功')
+    else error(res.message)
+    return res
   }
 }
 const mutations: MutationTree<IState> = {

@@ -5,43 +5,67 @@
  */
 import Vue from 'vue'
 import Router, { RouteConfig, Route, RawLocation } from 'vue-router'
-
 Vue.use(Router)
 
+const Release = () => import(/* webpackChunkName: "release" */ './views/article/Release.vue')
+const Layout = () => import(/* webpackChunkName: "index" */ './layout/index.vue')
+const Article = () => import(/* webpackChunkName: "home" */ './views/article/Article.vue')
+const Login = () => import(/* webpackChunkName: "login" */ './views/login.vue')
+const Tag = () => import(/*webpackChunkName: "tag" */ './views/tag/tags.vue')
 const routers: RouteConfig[] = [
   {
-    path: '/das',
-    redirect: {
-      name: '首页'
-    },
-    meta: { leaf: true, icon: 'icon-home', show: true},
-    component: () => import(/* webpackChunkName: "index" */ './layout/index.vue'),
+    path: '/',
+    name: '首页',
+    meta: { leaf: false, icon: 'icon-home', show: true},
+    component: Layout,
     children: [
       {
         path: '/home',
-        component: () => import(/* webpackChunkName: "about" */ './views/Article.vue'),
-        name: '首页',
-        meta: { requireAuth: true, leaf: false, show: true }
-      },
-      {
-        path: '/about',
-        name: 'about',
-        meta: { leaf: false, show: true },
-        component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+        component: Tag,
+        name: '标签管理',
+        meta: { requireAuth: true, leaf: false, show: false }
       }
     ]
   },
   {
-    path: '/about',
-    name: '日志',
-    meta: { leaf: false, icon: 'icon-log', show: true },
-    component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+    path: '/',
+    name: '文章管理',
+    meta: { leaf: true, icon: 'icon-log', show: true },
+    component: Layout,
+    children: [
+      {
+        path: '/article',
+        component: Article,
+        name: '文章列表',
+        meta: { requireAuth: true, leaf: false, show: true }
+      },
+      {
+        path: '/article/release',
+        component: Release,
+        name: '文章',
+        meta: { requireAuth: true, leaf: false, show: false }
+      }
+    ]
+  },
+  {
+    path: '/tag',
+    name: '标签管理',
+    meta: { leaf: false, show: true },
+    component: Layout,
+    children: [
+      {
+        path: '/tag',
+        component: Tag,
+        name: '标签管理',
+        meta: { requireAuth: true, leaf: false, show: false }
+      }
+    ]
   },
   {
     path: '/login',
     name: 'login',
     meta: { leaf: false, show: false },
-    component: () => import(/* webpackChunkName: "login" */ './views/login.vue')
+    component: Login
   }
 ]
 const router: Router = new Router({
