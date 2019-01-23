@@ -33,6 +33,14 @@ export function searchArts (params: any): Promise<Ajax.AjaxResponse> {
 export function getTagList () {
   return ajax.get('/tagList').then(res => res.data)
 }
+// addTag
+export function addTag (params: any) {
+  return ajax.post('/addTag', params).then( res => res.data)
+}
+// removeTag
+export function removeTag (params: any) {
+  return ajax.delete(`/delTag/${params}`).then( res => res.data)
+}
 // 获取评价
 export function getComment (params: any) {
   return ajax.get('/comments', { params }).then(res => res.data)
@@ -40,4 +48,8 @@ export function getComment (params: any) {
 // records
 export function getRecords () {
   return ajax.get('/getrecords').then(res => res.data)
+}
+// qiniu token
+export function getQnToken (random: any) {
+  return ajax.get(`/getQN?${random}`).then( res => res.data)
 }

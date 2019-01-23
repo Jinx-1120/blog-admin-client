@@ -48,6 +48,6 @@ export function format (times: string, format: string) {
   return res
 }
 function pluralize (time: any, label: any) {
-  return `${time}${label}以前`
+  return `${Math.floor(time)}${label}以前`
 }
 

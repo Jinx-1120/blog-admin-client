@@ -43,18 +43,18 @@ ajax.interceptors.response.use((response: any) => {
           query: { redirect: app.$route.fullPath }
         })
         break
-      case 201:
-        app.$message({
-          message: response.data.message,
-          type: 'success'
-        })
-        break
-      case 202:
-        app.$message({
-          message: response.data.message,
-          type: 'warning'
-        })
-        break
+      // case 201:
+      //   app.$message({
+      //     message: response.data.message,
+      //     type: 'success'
+      //   })
+      //   break
+      // case 202:
+      //   app.$message({
+      //     message: response.data.message,
+      //     type: 'warning'
+      //   })
+      //   break
       case 500:
         app.$message({
           message: response.data.message,

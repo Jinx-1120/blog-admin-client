@@ -8,9 +8,9 @@
         <el-button type="primary" @click="searchArts">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <!-- <router-link :to="{name:'addArticle'}"> -->
+        <router-link to="/article/release">
           <el-button type="primary">添加新文章</el-button>
-        <!-- </router-link> -->
+        </router-link>
       </el-form-item>
     </el-form>
     <div class="table-wrap">

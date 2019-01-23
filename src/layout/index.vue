@@ -41,7 +41,7 @@ export default class Layout extends Vue {
   private get classObject (): object {
     return {
       hideSidebar: !this.$store.state.app.sidebar.opend,
-      openSidebar: this.$store.state.app.sidebar.opend,
+      openSidebar: !this.$store.state.app.sidebar.opend,
       withoutAnimation: this.$store.state.app.sidebar.withoutAnimation
     }
   }
@@ -62,7 +62,7 @@ export default class Layout extends Vue {
 }
 .app-main {
   overflow-y: auto;
-  // min-height: calc(100vh - 86px);
+  min-height: calc(100vh - 86px);
 }
 </style>
  
