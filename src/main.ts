@@ -3,8 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import * as ElementUi from 'element-ui'
-import VueSimplemde from 'vue-simplemde'
-import 'simplemde/dist/simplemde.min.css'
+
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 import 'highlight.js/styles/atom-one-dark.css'
 import hljs from 'highlight.js'
 (window as any).hljs = hljs
@@ -13,7 +14,7 @@ import './assets/scss/index.scss'
 import { format } from './filter/index'
 
 Vue.use(ElementUi)
-Vue.use(VueSimplemde)
+Vue.use(mavonEditor)
 Vue.filter('format', format)
 Vue.config.productionTip = false
 

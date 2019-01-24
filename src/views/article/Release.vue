@@ -1,5 +1,5 @@
 <template>
-  <div class="release" :style="{height: Height}">
+  <div class="release" :style="{height: Height+ 'px'}">
     <el-form :model="articleData" ref="articleData" label-width="100px" class="articleData">
       <el-form-item label="文章名称" prop="title"
         :rules="[ { required: true, message: '请输入文章标题', trigger: 'blur' } ]" >
@@ -12,13 +12,16 @@
       <el-form-item label="内容" prop="content"
         :rules="[ { required: true, message: '请输入文章内容' } ]">
         <div class="editor-container" style="margin: 0 2px">
-          <!-- <Markdown id="contentEditor" @getContent="getContent" ref="contentEditor" :value="content" :zIndex="20"></Markdown> -->
-          <markdown-editor 
+          <!-- <v-markdown id="contentEditor" @getContent="getContent" ref="contentEditor" :value="content" :zIndex="20"></v-markdown> -->
+          <!-- <mavon-editor v-model="content"></mavon-editor> -->
+          <mavon-editor :ishljs="true" ref='markdown' @imgAdd="$imgAdd" :subfield="false" v-model="content" @change="editChange"></mavon-editor>
+
+          <!-- <markdown-editor 
             v-model="content" 
             ref="markdownEditor"
             :configs="configs"
             :highlight="true"
-            preview-class="markdown-body"></markdown-editor>
+            preview-class="markdown-body"></markdown-editor> -->
         </div>
       </el-form-item>
       <!-- <el-form-item label="所属标签" prop="tags">
@@ -38,7 +41,7 @@
       <el-form-item label="文章封面">
         <el-upload
           class="avatar-uploader"
-          action="https://up.qbox.me/"
+          :action="action"
           :data="qn"
           :show-file-list="false"
           :on-success="handleSuccess"
@@ -61,8 +64,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Markdown from '../../components/markdown.vue'
-import { error } from '../../utils/notification'
+import { error, success } from '../../utils/notification'
+import config from '../../config'
 
 interface IArt {
   title: string,
@@ -74,7 +77,6 @@ interface IArt {
 }
 @Component({
   components: {
-    Markdown
   }
 })
 export default class Release extends Vue {
@@ -86,6 +88,7 @@ export default class Release extends Vue {
     content: '',
     coverImg: ''
   }
+  private action: string = 'https://up.qbox.me/'
   private Height: number = 600
   private configs: any = {
     status: false,
@@ -112,14 +115,19 @@ export default class Release extends Vue {
     }
     this.articleData.tags = this.choiceTags
   }
+  // 缩略图上传成功
   private handleSuccess (): void {
-    this.articleData.coverImg = 'https://static.jinhaidi.cn/' + this.qn.key
+    this.articleData.coverImg = `${config.staticUrl}${this.qn.key}`
   }
   // 出错
   private handleError (res: Ajax.AjaxResponse): void {
     error(res.message)
   }
-  // 上传之前检测
+  /**
+   * @description: 上传文件类型大小检查
+   * @param {file} 上传文件
+   * @return: boolean
+   */
   private beforeUpload (file: File): boolean {
     this.qn.key = file.name
     const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
@@ -133,6 +141,40 @@ export default class Release extends Vue {
     return isJPG && isLt10M
   }
 
+  private editChange (val: any, render: any) {
+    this.content = val
+  }
+  /**
+   * @description: markdown 图片上传
+   * @param {pos}上传地址
+   * @param {$file}上传文件
+   * @return: null
+   */
+  private $imgAdd (pos: any, $file: any) {
+    const flag: boolean = this.beforeUpload($file)
+    if (flag) {
+      const xhr: XMLHttpRequest = new XMLHttpRequest()
+      const formData = new FormData()
+      formData.append('token', this.qn.token)
+      formData.append('key', $file.name)
+      formData.append('file', $file, $file.name)
+      const md: any = this.$refs.markdown
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          success('上传图片成功！')
+          md.$img2Url(pos, `${config.staticUrl}${JSON.parse(xhr.responseText).key}`)
+        } else {
+          error(xhr.responseText)
+        }
+      }
+      xhr.open('post', this.action, true)
+      xhr.send(formData)
+    }
+  }
+  /**
+   * @description: 获取mardown 内容
+   * @param {val} 内容
+   */
   private getContent (val: any) {
     this.articleData.content = val
   }
@@ -146,17 +188,18 @@ export default class Release extends Vue {
   private mounted (): void {
     const that = this
     this.$nextTick( () => {
-      that.Height = document.documentElement.clientHeight - 400
+      that.Height = document.documentElement.clientHeight - 84
     })
     window.onresize = () => {
-      that.Height = document.documentElement.clientHeight - 400
+      that.Height = document.documentElement.clientHeight - 84
     }
   }
 }
 </script>
 <style lang="scss" scoped>
 .release {
-  overflow-y: auto;
+  overflow-y: scroll;
+  text-align: left;
   .articleData {
     padding: 20px;
   }
