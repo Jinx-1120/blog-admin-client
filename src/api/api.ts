@@ -53,3 +53,11 @@ export function getRecords () {
 export function getQnToken (random: any) {
   return ajax.get(`/getQN?${random}`).then( res => res.data)
 }
+// add article
+export function addArt (params: any): Promise<Ajax.AjaxResponse> {
+  return ajax.post('/addArticle', params).then(res => res.data)
+}
+// delArticle
+export function delArt (artId: string): Promise<Ajax.AjaxResponse> {
+  return ajax.delete(`/delArticle/${artId}`).then(res => res.data)
+}

@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Vuex, { ActionTree, MutationTree } from 'vuex'
+// import Vue from 'vue'
+import { ActionTree, MutationTree } from 'vuex'
 import httpservice from '../../api'
-Vue.use(Vuex)
+// Vue.use(Vuex)
 
 interface IState {
   login: boolean
@@ -21,6 +21,9 @@ const mutations: MutationTree<IState> = {
   'SET_TOKEN' (state: IState, token: string): void {
     state.token = token
     window.localStorage.setItem('TOKEN', token)
+  },
+  'SET_USERINFO' (state: IState, info: any): void {
+    state.userInfo = info
   }
 }
 const actions: ActionTree<IState, any> = {
@@ -30,6 +33,8 @@ const actions: ActionTree<IState, any> = {
       commit('TOGGLE_LOGOUT', true)
       commit('SET_TOKEN', res.data.token)
       const info: Ajax.AjaxResponse = await httpservice.getInfo()
+      if (info.code === 200) commit('SET_USERINFO', info.data)
+      else commit('SET_USERINFO', {})
     } else {
       commit('TOGGLE_LOGOUT', false)
     }

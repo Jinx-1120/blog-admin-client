@@ -12,19 +12,15 @@ const ajaxconfig = {
   timeout: 5000,
   isRetryRequest: false
 }
-
 const ajax = axios.create(ajaxconfig)
 
 // 拦截器
 ajax.interceptors.request.use((config: any) => {
-  // 在发送请求显示加载动画
-  // loadinginstace
-  if (window.localStorage.getItem('TOKEN')) {
-    config.params = {
-      ...config.params,
-      'token': window.localStorage.getItem('TOKEN')
-    }
-    // config.headers.Authorization = `Bearer ${JSON.parse(window.localStorage.getItem('TOKEN') || '').token}`
+  config.params = {
+    ...config.params
+  },
+  config.headers = {
+    token: window.localStorage.getItem('TOKEN') ? window.localStorage.getItem('TOKEN') : ''
   }
   return config
 }, (error: string) => {

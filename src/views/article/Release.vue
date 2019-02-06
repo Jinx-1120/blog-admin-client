@@ -9,22 +9,7 @@
         :rules="[ { required: true, message: '请输入文章描述', trigger: 'blur' } ]" >
         <el-input v-model="articleData.description" clearable></el-input>
       </el-form-item>
-      <el-form-item label="内容" prop="content"
-        :rules="[ { required: true, message: '请输入文章内容' } ]">
-        <div class="editor-container" style="margin: 0 2px">
-          <!-- <v-markdown id="contentEditor" @getContent="getContent" ref="contentEditor" :value="content" :zIndex="20"></v-markdown> -->
-          <!-- <mavon-editor v-model="content"></mavon-editor> -->
-          <mavon-editor :ishljs="true" ref='markdown' @imgAdd="$imgAdd" :subfield="false" v-model="content" @change="editChange"></mavon-editor>
-
-          <!-- <markdown-editor 
-            v-model="content" 
-            ref="markdownEditor"
-            :configs="configs"
-            :highlight="true"
-            preview-class="markdown-body"></markdown-editor> -->
-        </div>
-      </el-form-item>
-      <!-- <el-form-item label="所属标签" prop="tags">
+      <el-form-item label="所属标签" prop="tags">
         <el-select v-model="onTag" placeholder="请选择文章标签" @change="choiceTag">
           <el-option v-for="item in tagData" :key="item._id" :label="item.tagName" :value="item.tagName"></el-option>
         </el-select>
@@ -37,7 +22,22 @@
             {{tag}}
           </el-tag>
         </div>
-      </el-form-item> -->
+      </el-form-item>
+      <el-form-item label="内容" prop="content"
+        :rules="[ { required: true, message: '请输入文章内容' } ]">
+        <div class="editor-container" style="margin: 0 2px">
+          <!-- <v-markdown id="contentEditor" @getContent="getContent" ref="contentEditor" :value="content" :zIndex="20"></v-markdown> -->
+          <!-- <mavon-editor v-model="content"></mavon-editor> -->
+          <mavon-editor :ishljs="true" ref='markdown' @imgAdd="$imgAdd" :subfield="false" v-model="articleData.content" @change="editChange"></mavon-editor>
+
+          <!-- <markdown-editor 
+            v-model="content" 
+            ref="markdownEditor"
+            :configs="configs"
+            :highlight="true"
+            preview-class="markdown-body"></markdown-editor> -->
+        </div>
+      </el-form-item>
       <el-form-item label="文章封面">
         <el-upload
           class="avatar-uploader"
@@ -51,20 +51,20 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
-      <!-- <el-form-item label="状态" prop="status" style="margin-top:30px">
+      <el-form-item label="状态" prop="status" style="margin-top:30px">
         <el-radio-group v-model="articleData.status">
           <el-radio :label="0">发布</el-radio>
           <el-radio :label="1">草稿</el-radio>
         </el-radio-group>
-      </el-form-item> -->
+      </el-form-item>
     </el-form>
-    <!-- <el-button :disabled="articleData.title === ''" @click="addArticle" style="margin-top:80px;" type="primary" icon="el-icon-document">确定</el-button> -->
+    <el-button :disabled="articleData.title === ''" @click="addArticle" style="margin-top:80px;" type="primary" icon="el-icon-document">确定</el-button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { error, success } from '../../utils/notification'
+// import { error, success } from '../../utils/notification'
 import config from '../../config'
 
 interface IArt {
@@ -121,7 +121,7 @@ export default class Release extends Vue {
   }
   // 出错
   private handleError (res: Ajax.AjaxResponse): void {
-    error(res.message)
+    this.$notify.error(res.message)
   }
   /**
    * @description: 上传文件类型大小检查
@@ -133,16 +133,16 @@ export default class Release extends Vue {
     const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
     const isLt10M = file.size / 1024 / 1024 < 10
     if (!isJPG) {
-      error('上传头像图片只能是 JPG/PNG 格式!')
+      this.$notify.error('上传头像图片只能是 JPG/PNG 格式!')
     }
     if (!isLt10M) {
-      error('上传头像图片大小不能超过 10MB!')
+      this.$notify.error('上传头像图片大小不能超过 10MB!')
     }
     return isJPG && isLt10M
   }
 
   private editChange (val: any, render: any) {
-    this.content = val
+    this.articleData.content = val
   }
   /**
    * @description: markdown 图片上传
@@ -161,10 +161,10 @@ export default class Release extends Vue {
       const md: any = this.$refs.markdown
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          success('上传图片成功！')
+          this.$notify.success('上传图片成功！')
           md.$img2Url(pos, `${config.staticUrl}${JSON.parse(xhr.responseText).key}`)
         } else {
-          error(xhr.responseText)
+          this.$notify.error(xhr.responseText)
         }
       }
       xhr.open('post', this.action, true)
@@ -178,14 +178,18 @@ export default class Release extends Vue {
   private getContent (val: any) {
     this.articleData.content = val
   }
-  private addArticle (): void {
-    console.log(11)
+  private async addArticle () {
+    const res = await this.$store.dispatch('addArt', this.articleData)
+    if (res.code === 200) this.$notify.success(res.message)
+    else this.$notify.error(res.message)
   }
   private async created () {
+    await this.$store.dispatch('getTags')
     await this.$store.dispatch('getQnToken')
     this.qn.token = this.$store.state.article.qntoken
   }
   private mounted (): void {
+    console.log(this.$route)
     const that = this
     this.$nextTick( () => {
       that.Height = document.documentElement.clientHeight - 84

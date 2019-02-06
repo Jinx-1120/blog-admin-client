@@ -40,7 +40,7 @@ const routers: RouteConfig[] = [
         meta: { requireAuth: true, leaf: false, show: true }
       },
       {
-        path: '/article/release',
+        path: '/article/release/:type/:id',
         component: Release,
         name: '文章',
         meta: { requireAuth: true, leaf: false, show: false }

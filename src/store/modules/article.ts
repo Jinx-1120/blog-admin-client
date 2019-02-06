@@ -82,6 +82,14 @@ const actions: ActionTree<IState, any> = {
     if (res.code === 200) commit('SET_QNTOKEN', res.data.token)
     else commit('SET_QNTOKEN', '')
     return res
+  },
+  async addArt ({}, payload): Promise<Ajax.AjaxResponse> {
+    const res: Ajax.AjaxResponse = await httpservice.addArt(payload)
+    return res
+  },
+  async delArt ({}, payload): Promise<Ajax.AjaxResponse> {
+    const res: Ajax.AjaxResponse = await httpservice.delArt(payload)
+    return res
   }
 }
 export default {

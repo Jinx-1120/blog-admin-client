@@ -8,7 +8,7 @@
         <el-button type="primary" @click="searchArts">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <router-link to="/article/release">
+        <router-link :to="{ name: 'article/release', params: {type: 1, id: 12}}">
           <el-button type="primary">添加新文章</el-button>
         </router-link>
       </el-form-item>
@@ -159,6 +159,23 @@ export default class Article extends Vue {
   }
   private async getTags (): Promise<void> {
     await this.$store.dispatch('getTags')
+  }
+  private removeTag (data: any) {
+    this.$confirm(`是否确定删除：${data.title}`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => {
+      const res = await this.$store.dispatch('delArt', data._id)
+      if (res.code === 200) this.$notify.success(res.message)
+      else this.$notify.error(res.message)
+      await this.getData()
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消删除'
+      })
+    })
   }
   private created (): void {
     Promise.all([
