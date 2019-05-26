@@ -13,6 +13,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import './assets/scss/index.scss'
 import { format } from './filter/index'
 
+
 Vue.use(ElementUi)
 Vue.use(mavonEditor)
 Vue.filter('format', format)
