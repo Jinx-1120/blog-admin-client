@@ -1,3 +1,9 @@
+/*
+ * @Author: jinhaidi
+ * @Date: 2019-09-15 15:11:41
+ * @Description: file content
+ * @LastEditTime: 2020-05-24 19:06:48
+ */
 import axios from 'axios';
 import {Loading, Message} from 'element-ui';
 import _ from 'lodash';
@@ -20,7 +26,7 @@ let instance = axios.create(ajaxconfig);
 instance.interceptors.request.use(function (config) {
   // 在发送请求显示加载动画
   // loadinginstace
-  config.params = {
+  config.headers = {
     'token': getToken()
   }
   if(config.url.indexOf('getQN') > 0) {
